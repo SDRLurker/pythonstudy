@@ -23,14 +23,14 @@ class Test(unittest.TestCase):
         self.assertEqual(['X','','','','','','','','','','','','','','','','','','','',''], self.b.getRolls())
         self.assertEqual(['','','','','','','','','',''], self.b.getScores())
 
-    #def testNormals(self):
+    def testNormals(self):
         # when
-    #    self.b.roll(10)
-    #    self.b.roll(7)
-    #    self.b.roll(2)
+        self.b.roll(10)
+        self.b.roll(7)
+        self.b.roll(2)
         # then
-    #    self.assertEqual(['X','',7,2,'','','','','','','','','','','','','','','','',''], self.b.getRolls())
-    #    self.assertEqual([19,28,'','','','','','','',''], self.b.getScores())
+        self.assertEqual(['X','',7,2,'','','','','','','','','','','','','','','','',''], self.b.getRolls())
+        self.assertEqual([19,28,'','','','','','','',''], self.b.getScores())
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

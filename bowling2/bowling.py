@@ -64,6 +64,16 @@ class Bowling:
             self.scoreIdx += 1
             self.turnSpare = -1
                 
+    def _processSymbol(self, isSpare, isStrike, pins):
+        if isSpare:     # 스페어처리가 스트라이크 처리 계산보다 우선순위 높음.
+            self.symbols[self._getSymbolIndex()] = '/'
+        elif isStrike:
+                self.symbols[self._getSymbolIndex()] = 'X'
+        elif pins == 0:
+            self.symbols[self._getSymbolIndex()] = '-'
+        else:
+            self.symbols[self._getSymbolIndex()] = pins
+        
     def roll(self, pins):
         if pins != 'F' and (pins < 0 or pins > 10):
             raise ValueError('pins 값은 F와 0과 10사이에 값만 허용됩니다.')
@@ -76,25 +86,17 @@ class Bowling:
             self.turns[self.turn] = pins
 
         if self.currentFrame <= 9:
-            # 전처리            
-            if self._isStrikeTil9(pins):
-                # 심볼로직
-                self.symbols[self._getSymbolIndex()] = 'X'
-                # 스트라이크인 turn 위치를 기억해 놓음.
-                if self.turnStrike == -1:
-                    self.turnStrike = self.turn
-            elif self._isSpareTil9():
-                # 심볼로직
-                self.symbols[self._getSymbolIndex()] = '/'
+            # 전처리
+            # 심볼로직
+            self._processSymbol(self._isSpareTil9(), self._isStrikeTil9(pins), pins)     
+            
+            # 스페어 및 스트라이크 과거처리를 위한 전처리
+            if self._isSpareTil9() and self.turnSpare == -1:
                 # 스페어인 turn 위치를 기억해 놓음.
-                if self.turnSpare == -1:
-                    self.turnSpare = self.turn
-            elif pins == 0:
-                # 심볼로직
-                self.symbols[self._getSymbolIndex()] = '-'
-            else:
-                # 심볼로직
-                self.symbols[self._getSymbolIndex()] = pins                
+                self.turnSpare = self.turn
+            elif self._isStrikeTil9(pins) and self.turnStrike == -1:
+                # 스트라이크인 turn 위치를 기억해 놓음.
+                self.turnStrike = self.turn
                 
             # 스트라이크 과거 점수처리    
             self._caculPastStrike()
@@ -117,15 +119,8 @@ class Bowling:
             
         elif self.currentFrame == 10:
             # 전처리
-            # 심볼로직    
-            if self._isSpareAt10(): # 스페어처리가 스트라이크 처리 계산보다 우선순위 높음.
-                self.symbols[self._getSymbolIndex()] = '/'
-            elif self._isStrikeAt10(pins):
-                self.symbols[self._getSymbolIndex()] = 'X'
-            elif pins == 0:
-                self.symbols[self._getSymbolIndex()] = '-'
-            else:
-                self.symbols[self._getSymbolIndex()] = pins           
+            # 심볼로직
+            self._processSymbol(self._isSpareAt10(), self._isStrikeAt10(pins), pins)           
             
             # 점수계산로직
             # 스트라이크 과거 점수처리

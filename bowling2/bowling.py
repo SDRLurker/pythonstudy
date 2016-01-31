@@ -73,6 +73,17 @@ class Bowling:
             self.symbols[self._getSymbolIndex()] = '-'
         else:
             self.symbols[self._getSymbolIndex()] = pins
+    
+    def _caculPast(self):
+         # 스트라이크 과거 점수처리    
+        self._caculPastStrike()
+        # 스페어  과거 점수처리
+        self._caculPastSpare()
+        
+    def _caculCurrentScore(self):
+        lastScore = self._getLastScore()
+        self.scores[self.scoreIdx] = lastScore + sum(self.turns[self.turn-self.turnInFrame+1:self.turn+1])
+        self.scoreIdx += 1
         
     def roll(self, pins):
         if pins != 'F' and (pins < 0 or pins > 10):
@@ -97,16 +108,13 @@ class Bowling:
             elif self._isStrikeTil9(pins) and self.turnStrike == -1:
                 # 스트라이크인 turn 위치를 기억해 놓음.
                 self.turnStrike = self.turn
-                
-            # 스트라이크 과거 점수처리    
-            self._caculPastStrike()
-            # 스페어  과거 점수처리
-            self._caculPastSpare()
+               
+            # 점수계산로직
+            self._caculPast()
+           
             # 일반점수처리
             if self.turnInFrame == 2 and not self._isSpareTil9() and not self._isSpareTil9():
-                lastScore = self._getLastScore()
-                self.scores[self.scoreIdx] = lastScore + sum(self.turns[self.turn-1:self.turn+1])
-                self.scoreIdx += 1
+                self._caculCurrentScore()
                 
             # 후처리 : 다음처리를 계산
             if self._isStrikeTil9(pins):
@@ -123,10 +131,7 @@ class Bowling:
             self._processSymbol(self._isSpareAt10(), self._isStrikeAt10(pins), pins)           
             
             # 점수계산로직
-            # 스트라이크 과거 점수처리
-            self._caculPastStrike()
-            # 스페어  과거 점수처리
-            self._caculPastSpare()
+            self._caculPast()
             
             # 게임 끝났는지 조건 확인.
             if self.turnInFrame == 2 and sum(self.turns[self.turn-1:self.turn+1]) < 10:
@@ -136,9 +141,7 @@ class Bowling:
                 
             # 게임이 종료하면 마지막 점수처리.
             if self.isPlaying == False:
-                lastScore = self._getLastScore()
-                self.scores[self.scoreIdx] = lastScore + sum(self.turns[self.turn-self.turnInFrame+1:self.turn+1])
-                self.scoreIdx += 1
+                self._caculCurrentScore()
             
             # 후처리
             self.turnInFrame += 1
